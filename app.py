@@ -15,7 +15,7 @@ ALLOWED_EXTENSIONS = set(['txt','png','jpg','xls','JPG','PNG','xlsx','gif','GIF'
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.',1)[1] in ALLOWED_EXTENSIONS
 
-# 用于测试上传，稍后用到
+# 用于测试上传
 @app.route('/')
 def upload_test():
     return render_template('base.html')
