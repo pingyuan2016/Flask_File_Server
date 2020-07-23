@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from werkzeug.utils import secure_filename
-from flask import Flask,render_template,abort,request
+from flask import Flask, render_template, abort, request, make_response
 from flask import send_from_directory
 import os
-
 
 app = Flask(__name__)
 UPLOAD_FOLDER='upload'
@@ -38,13 +36,16 @@ def api_upload():
             return render_template('base.html')
             # return jsonify({"errno":1001,"errmsg":"上传失败"})
 
-@app.route('/download/<filename>', methods=['GET'])
-def download(filename):
+@app.route('/download', methods=['GET'])
+def download():
     if request.method =="GET":
+        filename = request.values.get('filename')
         file_path =os.path.join(basedir,app.config['UPLOAD_FOLDER'])
-        if os.path.join(file_path, filename):
-            return send_from_directory(file_path,filename, as_attachment=True)
-        abort(404)
+        # 解决中文乱码问题
+        response = make_response(send_from_directory(file_path, filename, as_attachment=True))
+        response.headers["Content-Disposition"] = "attachment; filename{}".format(filename.encode().decode('latin-1'))
+        return response
+    return abort(404)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=8067,debug=True)
